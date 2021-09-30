@@ -1,0 +1,5 @@
+aiohttp[speedups]==3.7.4.post0
+fastapi==0.68.1
+rapidfuzz==1.7.0
+Jinja2==3.0.1
+psutil
