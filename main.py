@@ -20,7 +20,6 @@ else:
 app = FastAPI(title="UDB API", version="0.1.0")
 process = psutil.Process()
 jinja_env = Environment(loader=FileSystemLoader('templates'), enable_async=True)
-session = aiohttp.ClientSession()
 CUTOFF_SCORE = 70
 
 
@@ -44,6 +43,7 @@ class Universal_DB:
 @app.on_event("startup")
 async def cache_udb():
     # TODO: Make this refresh every 60 minutes or on a request to a /refresh endpoint
+    app.state.session = session = aiohttp.ClientSession()
     url = "https://raw.githubusercontent.com/Universal-Team/db/master/docs/data/full.json"
     resp = await session.get(url)
     r = json.loads(await resp.text())
@@ -52,7 +52,7 @@ async def cache_udb():
 
 @app.on_event("shutdown")
 async def on_shutdown():
-    await session.close()
+    await app.state.session.close()
 
 
 @app.get("/search/{application}")
