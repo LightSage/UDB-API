@@ -1,4 +1,5 @@
 import json
+import random
 from dataclasses import dataclass
 from typing import Dict, Optional
 
@@ -47,6 +48,10 @@ class Universal_DB:
                 return app
         return None
 
+    def get_random_app(self) -> dict:
+        choice = random.choice(self.cache)
+        return choice
+
 
 @app.on_event("startup")
 async def cache_udb():
@@ -90,6 +95,13 @@ async def get_app(application: str):
         raise HTTPException(status_code=404, detail="Application not found")
 
     return a
+
+
+@app.get("/random")
+async def get_random_app():
+    """Gets a random application"""
+    result = app.state.cache.get_random_app()
+    return result
 
 
 @app.get("/stats")
