@@ -1,1 +1,2 @@
 sentry_dsn = ""
+samples_rate = 0.5

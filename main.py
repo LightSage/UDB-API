@@ -1,13 +1,17 @@
 import json
 from dataclasses import dataclass
-from typing import Dict
+from typing import Dict, Optional
 
 import aiohttp
 import psutil
+import sentry_sdk
 from fastapi import FastAPI, HTTPException
 from jinja2 import Environment, FileSystemLoader
 from rapidfuzz import process as fwprocess
+from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 from starlette.responses import HTMLResponse
+
+import config
 
 try:
     import uvloop
@@ -20,6 +24,10 @@ else:
 app = FastAPI(title="UDB API", version="0.1.0")
 process = psutil.Process()
 jinja_env = Environment(loader=FileSystemLoader('templates'), enable_async=True)
+# Sentry.io
+sentry_sdk.init(config.sentry_dsn, traces_sample_rate=config.samples_rate)
+app.add_middleware(SentryAsgiMiddleware)
+# constants
 CUTOFF_SCORE = 70
 
 
@@ -33,7 +41,7 @@ class Universal_DB:
             apps.append(app['title'])
         return apps
 
-    def get_app(self, application):
+    def get_app(self, application) -> Optional[dict]:
         for app in self.cache:
             if app['title'] == application:
                 return app
