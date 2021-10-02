@@ -98,10 +98,20 @@ async def get_app(application: str):
 
 
 @app.get("/random")
-async def get_random_app():
+async def get_random_app(limit: Optional[int] = None):
     """Gets a random application"""
-    result = app.state.cache.get_random_app()
-    return result
+    limit = limit or 1
+
+    if limit > len(app.state.cache.cache):
+        raise HTTPException(400, "Limit is too high.")
+
+    apps = []
+    for i in range(limit):
+        # TODO: Unique only
+        appl = app.state.cache.get_random_app()
+        apps.append(appl)
+
+    return apps
 
 
 @app.get("/stats")
