@@ -129,6 +129,12 @@ async def get_random_app(limit: Optional[int] = None):
     return apps
 
 
+@app.get("/all")
+async def get_raw_cache():
+    """Gets all applications that are cached"""
+    return app.state.cache.cache
+
+
 @app.get("/stats")
 async def get_stats():
     mem = process.memory_full_info().uss / 1024**2
