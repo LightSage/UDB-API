@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+import asyncio
 import json
 import random
 from dataclasses import dataclass
@@ -37,7 +38,7 @@ else:
     uvloop.install()
 
 
-app = FastAPI(title="UDB API", version="0.1.0")
+app = FastAPI(title="UDB API", version="0.2.0")
 process = psutil.Process()
 jinja_env = Environment(loader=FileSystemLoader('templates'), enable_async=True)
 # Sentry.io
@@ -68,14 +69,21 @@ class Universal_DB:
         return choice
 
 
+async def udb_cache_loop():
+    while True:
+        url = "https://raw.githubusercontent.com/Universal-Team/db/master/docs/data/full.json"
+        resp = await app.state.session.get(url)
+        r = json.loads(await resp.text())
+        app.state.cache = Universal_DB(r)
+        await asyncio.sleep(600)
+
+
 @app.on_event("startup")
-async def cache_udb():
-    # TODO: Make this refresh every 60 minutes or on a request to a /refresh endpoint
-    app.state.session = session = aiohttp.ClientSession()
-    url = "https://raw.githubusercontent.com/Universal-Team/db/master/docs/data/full.json"
-    resp = await session.get(url)
-    r = json.loads(await resp.text())
-    app.state.cache = Universal_DB(r)
+async def on_startup():
+    app.state.session = aiohttp.ClientSession(headers="UDB-API v0.2.0/https://github.com/LightSage/UDB-API")
+    loop = asyncio.get_running_loop()
+    # TODO: Make this refresh on a request to a /refresh endpoint
+    loop.create_task(udb_cache_loop())
 
 
 @app.on_event("shutdown")
