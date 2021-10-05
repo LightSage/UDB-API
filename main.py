@@ -80,7 +80,7 @@ async def udb_cache_loop():
 
 @app.on_event("startup")
 async def on_startup():
-    app.state.session = aiohttp.ClientSession(headers="UDB-API v0.2.0/https://github.com/LightSage/UDB-API")
+    app.state.session = aiohttp.ClientSession(headers={"User-Agent": "UDB-API v0.2.0/https://github.com/LightSage/UDB-API"})
     loop = asyncio.get_running_loop()
     # TODO: Make this refresh on a request to a /refresh endpoint
     loop.create_task(udb_cache_loop())
