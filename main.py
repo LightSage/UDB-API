@@ -14,7 +14,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 import asyncio
-import json
 import random
 from dataclasses import dataclass
 from typing import Dict, Optional
@@ -71,9 +70,9 @@ class Universal_DB:
 
 async def udb_cache_loop():
     while True:
-        url = "https://raw.githubusercontent.com/Universal-Team/db/master/docs/data/full.json"
+        url = "https://db.universal-team.net/data/full.json"
         resp = await app.state.session.get(url)
-        r = json.loads(await resp.text())
+        r = await resp.json()
         app.state.cache = Universal_DB(r)
         await asyncio.sleep(600)
 
