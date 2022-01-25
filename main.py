@@ -1,5 +1,5 @@
 """
-Copyright 2021 LightSage
+Copyright 2021-2022 LightSage
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -52,10 +52,7 @@ class Universal_DB:
     cache: dict
 
     def get_app_names(self) -> list:
-        apps = []
-        for app in self.cache:
-            apps.append(app['title'])
-        return apps
+        return [app['title'] for app in self.cache]
 
     def get_app(self, application) -> Optional[dict]:
         for app in self.cache:
@@ -64,25 +61,33 @@ class Universal_DB:
         return None
 
     def get_random_app(self) -> dict:
-        choice = random.choice(self.cache)
-        return choice
+        return random.choice(self.cache)
 
 
 async def udb_cache_loop():
     while True:
-        url = "https://db.universal-team.net/data/full.json"
-        resp = await app.state.session.get(url)
+        resp = await app.state.session.get("https://db.universal-team.net/data/full.json")
         r = await resp.json()
         app.state.cache = Universal_DB(r)
         await asyncio.sleep(600)
 
 
+def _log_exception(task):
+    try:
+        exc = task.exception()
+    except asyncio.CancelledError:
+        return
+
+    sentry_sdk.capture_exception(exc)
+    print(f"An exception occurred {exc}")
+
+
 @app.on_event("startup")
 async def on_startup():
     app.state.session = aiohttp.ClientSession(headers={"User-Agent": "UDB-API v0.2.0/https://github.com/LightSage/UDB-API"})
-    loop = asyncio.get_running_loop()
     # TODO: Make this refresh on a request to a /refresh endpoint
-    loop.create_task(udb_cache_loop())
+    task = asyncio.create_task(udb_cache_loop())
+    task.add_done_callback(_log_exception)
 
 
 @app.on_event("shutdown")
@@ -128,7 +133,7 @@ async def get_random_app(limit: Optional[int] = None):
         raise HTTPException(400, "Limit is too high.")
 
     apps = []
-    for i in range(limit):
+    for _ in range(limit):
         # TODO: Unique only
         appl = app.state.cache.get_random_app()
         apps.append(appl)
