@@ -14,6 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 import asyncio
+from datetime import datetime, timezone
 import random
 from dataclasses import dataclass
 from typing import Dict, Optional
@@ -50,6 +51,7 @@ CUTOFF_SCORE = 70
 @dataclass
 class Universal_DB:
     cache: dict
+    integrity: datetime = datetime.now(timezone.utc)
 
     def get_app_names(self) -> list:
         return [app['title'] for app in self.cache]
@@ -66,8 +68,8 @@ class Universal_DB:
 
 async def udb_cache_loop():
     while True:
-        resp = await app.state.session.get("https://db.universal-team.net/data/full.json")
-        r = await resp.json()
+        async with app.state.session.get("https://db.universal-team.net/data/full.json") as resp:
+            r = await resp.json()
         app.state.cache = Universal_DB(r)
         await asyncio.sleep(600)
 
@@ -150,7 +152,8 @@ async def get_raw_cache():
 @app.get("/stats")
 async def get_stats():
     mem = process.memory_full_info().uss / 1024**2
-    return {"memory": f"{mem:.2f}", "cached_applications": len(app.state.cache.cache)}
+    return {"memory": f"{mem:.2f}", "cached_applications": len(app.state.cache.cache),
+            "last_update": app.state.cache.integrity.isoformat()}
 
 
 @app.get("/", include_in_schema=False)
