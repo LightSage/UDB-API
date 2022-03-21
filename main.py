@@ -38,7 +38,7 @@ else:
     uvloop.install()
 
 
-app = FastAPI(title="UDB API", version="0.2.0")
+app = FastAPI(title="UDB API", version="0.3.1")
 process = psutil.Process()
 jinja_env = Environment(loader=FileSystemLoader('templates'), enable_async=True)
 # Sentry.io
@@ -51,7 +51,7 @@ CUTOFF_SCORE = 70
 @dataclass
 class Universal_DB:
     cache: dict
-    integrity: datetime = datetime.now(timezone.utc)
+    integrity: datetime
 
     def get_app_names(self) -> list:
         return [app['title'] for app in self.cache]
@@ -70,7 +70,7 @@ async def udb_cache_loop():
     while True:
         async with app.state.session.get("https://db.universal-team.net/data/full.json") as resp:
             r = await resp.json()
-        app.state.cache = Universal_DB(r)
+        app.state.cache = Universal_DB(r, datetime.now(timezone.utc))
         await asyncio.sleep(600)
 
 
