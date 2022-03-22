@@ -13,10 +13,11 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+from __future__ import annotations
+
 import asyncio
-from datetime import datetime, timezone
 import random
-from dataclasses import dataclass
+from datetime import datetime, timezone
 from typing import Dict, Optional
 
 import aiohttp
@@ -38,7 +39,7 @@ else:
     uvloop.install()
 
 
-app = FastAPI(title="UDB API", version="0.3.1")
+app = FastAPI(title="UDB API", version="0.3.2")
 process = psutil.Process()
 jinja_env = Environment(loader=FileSystemLoader('templates'), enable_async=True)
 # Sentry.io
@@ -48,10 +49,12 @@ app.add_middleware(SentryAsgiMiddleware)
 CUTOFF_SCORE = 70
 
 
-@dataclass
 class Universal_DB:
-    cache: dict
-    integrity: datetime
+    __slots__ = ("cache", "integrity")
+
+    def __init__(self, cache: dict) -> None:
+        self.cache: dict = cache
+        self.integrity: datetime = datetime.now(timezone.utc)
 
     def get_app_names(self) -> list:
         return [app['title'] for app in self.cache]
@@ -70,7 +73,8 @@ async def udb_cache_loop():
     while True:
         async with app.state.session.get("https://db.universal-team.net/data/full.json") as resp:
             r = await resp.json()
-        app.state.cache = Universal_DB(r, datetime.now(timezone.utc))
+
+        app.state.cache = Universal_DB(r)
         await asyncio.sleep(600)
 
 
@@ -100,13 +104,9 @@ async def on_shutdown():
 @app.get("/search/{application}")
 async def search_apps(application: str) -> Dict[str, list]:
     """Searches for applications."""
-    results = fwprocess.extract(application, app.state.cache.get_app_names())
     apps = []
-    for name, score, _ in results:
-        # Why waste a lookup
-        if score < CUTOFF_SCORE:
-            continue
-
+    for name, _, _ in fwprocess.extract_iter(application, app.state.cache.get_app_names(),
+                                             score_cutoff=CUTOFF_SCORE):
         a = app.state.cache.get_app(name)
         apps.append(a)
 
