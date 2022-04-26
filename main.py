@@ -18,14 +18,15 @@ from __future__ import annotations
 import asyncio
 import random
 from datetime import datetime, timezone
-from typing import Dict, Optional
+from typing import Any, Dict, List, Optional
 
 import aiohttp
 import psutil
+import rapidfuzz.fuzz
+import rapidfuzz.process
 import sentry_sdk
 from fastapi import FastAPI, HTTPException
 from jinja2 import Environment, FileSystemLoader
-from rapidfuzz import process as fwprocess
 from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 from starlette.responses import HTMLResponse
 
@@ -39,7 +40,7 @@ else:
     uvloop.install()
 
 
-app = FastAPI(title="UDB API", version="0.3.2")
+app = FastAPI(title="UDB API", version="0.4.0")
 process = psutil.Process()
 jinja_env = Environment(loader=FileSystemLoader('templates'), enable_async=True)
 # Sentry.io
@@ -52,20 +53,20 @@ CUTOFF_SCORE = 70
 class Universal_DB:
     __slots__ = ("cache", "integrity")
 
-    def __init__(self, cache: dict) -> None:
-        self.cache: dict = cache
+    def __init__(self, cache: Dict[str, Any]) -> None:
+        self.cache: Dict[str, Any] = cache
         self.integrity: datetime = datetime.now(timezone.utc)
 
-    def get_app_names(self) -> list:
+    def get_app_names(self) -> List[str]:
         return [app['title'] for app in self.cache]
 
-    def get_app(self, application) -> Optional[dict]:
+    def get_app(self, application) -> Optional[Dict[str, Any]]:
         for app in self.cache:
             if app['title'] == application:
                 return app
         return None
 
-    def get_random_app(self) -> dict:
+    def get_random_app(self) -> Dict[str, Any]:
         return random.choice(self.cache)
 
 
@@ -105,8 +106,24 @@ async def on_shutdown():
 async def search_apps(application: str) -> Dict[str, list]:
     """Searches for applications."""
     apps = []
-    for name, _, _ in fwprocess.extract_iter(application, app.state.cache.get_app_names(),
-                                             score_cutoff=CUTOFF_SCORE):
+    all_apps: List[str] = app.state.cache.get_app_names()
+    all_apps.sort(key=len)
+    for name, _, _ in rapidfuzz.process.extract_iter(application, all_apps, scorer=rapidfuzz.fuzz.QRatio,
+                                                     score_cutoff=65):
+        a = app.state.cache.get_app(name)
+        apps.append(a)
+
+    return {"results": apps}
+
+
+@app.get("/lsearch/{application}")
+async def lsearch_apps(application: str) -> Dict[str, list]:
+    """Legacy search endpoint.
+
+    Searches for applications."""
+    apps = []
+    for name, _, _ in rapidfuzz.process.extract_iter(application, app.state.cache.get_app_names(),
+                                                     score_cutoff=CUTOFF_SCORE):
         a = app.state.cache.get_app(name)
         apps.append(a)
 
