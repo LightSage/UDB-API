@@ -1,0 +1,6 @@
+{
+    "REDIS": "redis://localhost:6379",
+    "CUTOFF_SCORE": 70,
+    "SENTRY_DSN": "",
+    "SENTRY_SAMPLES_RATE": 0.5
+}
