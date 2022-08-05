@@ -1,8 +1,11 @@
 from __future__ import annotations
 
+import json
 import random
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
+
+import aioredis
 
 if TYPE_CHECKING:
     from typing_extensions import Self
@@ -31,7 +34,8 @@ class Universal_DB:
         return random.choice(self.cache)
 
     @classmethod
-    async def from_redis(cls, pool) -> Self:
+    async def from_redis(cls, pool: aioredis.Redis) -> Self:
         integrity = await pool.get("udb:integrity")
         cache = await pool.get("udb:cache")
-        return cls(cache, integrity)
+        cache = json.loads(cache)
+        return cls(cache, datetime.fromisoformat(integrity))
