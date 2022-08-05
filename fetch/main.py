@@ -19,11 +19,12 @@ from datetime import datetime, timezone
 
 import aiohttp
 import aioredis
+import sentry_sdk
 
 import config
 
 
-async def main():
+async def actual_work():
     redis = await aioredis.from_url(config.REDIS)
     async with aiohttp.ClientSession() as session:
         async with session.get("https://db.universal-team.net/data/full.json") as resp:
@@ -31,6 +32,20 @@ async def main():
 
     await redis.set("udb:cache", json.dumps(r))
     await redis.set("udb:integrity", datetime.now(timezone.utc).isoformat())
+
+
+async def main():
+    sentry_sdk.init(config.sentry_dsn)
+
+    while True:
+
+        try:
+            await actual_work()
+        except Exception as exc:
+            sentry_sdk.capture_exception(exc)
+            exit(1)
+
+        await asyncio.sleep(600)
 
 
 if __name__ == "__main__":
