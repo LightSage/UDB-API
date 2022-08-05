@@ -21,11 +21,9 @@ import aiohttp
 import aioredis
 import sentry_sdk
 
-import config
 
-
-async def actual_work():
-    redis = await aioredis.from_url(config.REDIS)
+async def actual_work(redis_dsn: str):
+    redis = await aioredis.from_url(redis_dsn)
     async with aiohttp.ClientSession() as session:
         async with session.get("https://db.universal-team.net/data/full.json") as resp:
             r = await resp.json()
@@ -35,12 +33,15 @@ async def actual_work():
 
 
 async def main():
-    sentry_sdk.init(config.sentry_dsn)
+    with open("config.json") as fp:
+        config = json.load(fp)
+
+    sentry_sdk.init(config['SENTRY_DSN'])
 
     while True:
 
         try:
-            await actual_work()
+            await actual_work(config['REDIS'])
         except Exception as exc:
             sentry_sdk.capture_exception(exc)
             exit(1)
@@ -49,4 +50,7 @@ async def main():
 
 
 if __name__ == "__main__":
-    asyncio.run(main())
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        exit(0)
