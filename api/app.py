@@ -25,6 +25,7 @@ from jinja2 import Environment, FileSystemLoader
 from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 from starlette.responses import HTMLResponse
 
+from .models import Universal_DB
 from .routers import add_routers
 from .utils import log_exception, setup_redis
 
@@ -47,8 +48,6 @@ add_routers(app)
 
 async def udb_cache_loop():
     while True:
-        from .models import Universal_DB
-
         # There's no reason why integrity and cache should not exist...
         app.state.cache = await Universal_DB.from_redis(app.redis)
         await asyncio.sleep(600)
@@ -59,9 +58,10 @@ async def on_startup() -> None:
     with open("config.json") as fp:
         config = json.load(fp)
 
-    app.redis = await setup_redis(config['REDIS'])
     sentry_sdk.init(config['SENTRY_DSN'], traces_sample_rate=config['SENTRY_SAMPLES_RATE'])
     app.add_middleware(SentryAsgiMiddleware)
+
+    app.redis = await setup_redis(config['REDIS'])
 
     task = asyncio.create_task(udb_cache_loop())
     task.add_done_callback(log_exception)
