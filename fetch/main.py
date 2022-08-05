@@ -15,6 +15,7 @@ limitations under the License.
 """
 import asyncio
 import json
+import os.path
 from datetime import datetime, timezone
 
 import aiohttp
@@ -37,6 +38,10 @@ async def main():
         config = json.load(fp)
 
     sentry_sdk.init(config['SENTRY_DSN'])
+
+    if not os.path.exists("/.dockerenv"):
+        await actual_work(config['REDIS'])
+        return
 
     while True:
 
