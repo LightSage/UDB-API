@@ -4,7 +4,7 @@ from fastapi import APIRouter
 from ..request import Request
 
 process = psutil.Process()
-router = APIRouter()
+router = APIRouter(tags=['admin'])
 
 
 @router.get("/stats")

@@ -5,7 +5,7 @@ from fastapi import APIRouter
 
 from ..request import Request
 
-router = APIRouter(prefix="/v0")
+router = APIRouter(prefix="/v0", tags=['applications', 'v0'])
 
 
 @router.get("/search/{application}", deprecated=True)

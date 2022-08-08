@@ -5,7 +5,7 @@ from fastapi import APIRouter, HTTPException
 
 from ..request import Request
 
-router = APIRouter()
+router = APIRouter(tags=['applications'])
 
 
 @router.get("/search/{application}")
