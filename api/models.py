@@ -4,6 +4,7 @@ import json
 import random
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, TypedDict
+from pydantic import BaseModel
 
 import aioredis
 
@@ -41,7 +42,7 @@ class Universal_DB:
         return cls(cache, datetime.fromisoformat(integrity))
 
 
-class Application(TypedDict):
+class Application(BaseModel):
     # This is kinda a guess, hopefully it's right.
     updated: Optional[str]
     categories: Optional[List[str]]
@@ -53,7 +54,7 @@ class Application(TypedDict):
     version: str
     systems: List[Literal['3DS', 'DS']]
     downloads: Dict[str, ApplicationDownload]
-    created: str
+    created: datetime
     screenshots: Optional[List[ApplicationScreenshot]]
     scripts: Optional[Dict[str, ApplicationScript]]
     priority: Optional[bool]
