@@ -42,6 +42,7 @@ class App(FastAPI):
 
 
 app = App(title="UDB API", version="1.1.0", docs_url='/swagger-docs', redoc_url=None)
+app.add_middleware(SentryAsgiMiddleware)
 jinja_env = Environment(loader=FileSystemLoader('templates'), enable_async=True)
 add_routers(app)
 
@@ -58,8 +59,8 @@ async def on_startup() -> None:
     with open("config.json") as fp:
         config = json.load(fp)
 
-    sentry_sdk.init(config['SENTRY_DSN'], traces_sample_rate=config['SENTRY_SAMPLES_RATE'])
-    app.add_middleware(SentryAsgiMiddleware)
+    sentry_sdk.init(config['SENTRY_DSN'],
+                    traces_sample_rate=config['SENTRY_SAMPLES_RATE'])
 
     app.redis = await setup_redis(config['REDIS'])
 
