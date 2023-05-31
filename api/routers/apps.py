@@ -30,7 +30,7 @@ async def search_apps(application: str, request: Request) -> Dict[str, List[Dict
     all_apps: List[str] = request.app.state.cache.get_app_names()
     all_apps.sort(key=len)
     for name, _, _ in rapidfuzz.process.extract(application, all_apps, scorer=rapidfuzz.fuzz.QRatio,
-                                                score_cutoff=55):
+                                                score_cutoff=50):
         a = request.app.state.cache.get_app(name)
         apps.append(a)
 
@@ -68,6 +68,6 @@ async def get_random_app(request: Request, limit: Optional[int] = None):
 
 
 @router.get("/all")
-async def get_raw_cache(request: Request):
+async def get_all_apps(request: Request):
     """Gets all applications that are cached"""
     return request.app.state.cache.cache
