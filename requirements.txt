@@ -3,6 +3,6 @@ fastapi==0.95.2
 rapidfuzz==2.8.0
 Jinja2==3.1.2
 psutil==5.9.2
-sentry-sdk==1.24.0
+sentry-sdk==1.25.0
 aioredis
 typing_extensions==4.2.0
