@@ -18,7 +18,7 @@ from __future__ import annotations
 import asyncio
 import json
 
-import aioredis
+from redis import asyncio as aioredis
 import sentry_sdk
 from fastapi import FastAPI
 from jinja2 import Environment, FileSystemLoader

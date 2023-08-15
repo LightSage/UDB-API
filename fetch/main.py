@@ -19,7 +19,7 @@ import os.path
 from datetime import datetime, timezone
 
 import aiohttp
-import aioredis
+from redis import asyncio as aioredis
 import sentry_sdk
 
 

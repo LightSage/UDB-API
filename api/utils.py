@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import asyncio
 
-import aioredis
+from redis import asyncio as aioredis
 import sentry_sdk
 
 

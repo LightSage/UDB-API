@@ -5,7 +5,7 @@ import random
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, Dict, List, Optional
 
-import aioredis
+from redis import asyncio as aioredis
 
 if TYPE_CHECKING:
     from typing_extensions import Self
