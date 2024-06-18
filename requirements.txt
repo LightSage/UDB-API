@@ -2,7 +2,7 @@ aiohttp[speedups]==3.8.4
 fastapi>=0.109.1
 rapidfuzz==2.8.0
 Jinja2==3.1.2
-psutil==5.9.2
+psutil==6.0.0
 sentry-sdk==1.40.1
 redis
 typing_extensions==4.9.0
