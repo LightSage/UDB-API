@@ -22,7 +22,6 @@ from redis import asyncio as aioredis
 import sentry_sdk
 from fastapi import FastAPI
 from jinja2 import Environment, FileSystemLoader
-from sentry_sdk.integrations.asgi import SentryAsgiMiddleware
 from starlette.responses import HTMLResponse
 
 from .models import Universal_DB
@@ -37,12 +36,20 @@ else:
     uvloop.install()
 
 
+def load_sentry():
+    with open("config.json") as fp:
+        config = json.load(fp)
+
+    sentry_sdk.init(config['SENTRY_DSN'],
+                    traces_sample_rate=config['SENTRY_SAMPLES_RATE'])
+
+
 class App(FastAPI):
     redis: aioredis.Redis
 
 
-app = App(title="UDB API", version="1.1.0", docs_url='/swagger-docs', redoc_url=None)
-app.add_middleware(SentryAsgiMiddleware)
+load_sentry()
+app = App(title="UDB API", version="1.2.0", docs_url='/swagger-docs', redoc_url=None)
 jinja_env = Environment(loader=FileSystemLoader('templates'), enable_async=True)
 add_routers(app)
 
@@ -58,9 +65,6 @@ async def udb_cache_loop():
 async def on_startup() -> None:
     with open("config.json") as fp:
         config = json.load(fp)
-
-    sentry_sdk.init(config['SENTRY_DSN'],
-                    traces_sample_rate=config['SENTRY_SAMPLES_RATE'])
 
     app.redis = await setup_redis(config['REDIS'])
 
