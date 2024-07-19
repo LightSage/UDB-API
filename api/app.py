@@ -1,5 +1,5 @@
 """
-Copyright 2021-2022 LightSage
+Copyright 2021-2024 LightSage
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -49,7 +49,7 @@ class App(FastAPI):
 
 
 load_sentry()
-app = App(title="UDB API", version="1.2.0", docs_url='/swagger-docs', redoc_url=None)
+app = App(title="UDB API", version="1.2.1", docs_url='/swagger-docs', redoc_url=None)
 jinja_env = Environment(loader=FileSystemLoader('templates'), enable_async=True)
 add_routers(app)
 
