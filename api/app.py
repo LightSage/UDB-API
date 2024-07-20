@@ -49,7 +49,7 @@ class App(FastAPI):
 
 
 load_sentry()
-app = App(title="UDB API", version="1.2.1", docs_url='/swagger-docs', redoc_url=None)
+app = App(title="UDB API", version="1.3.0", docs_url='/swagger-docs', redoc_url=None)
 jinja_env = Environment(loader=FileSystemLoader('templates'), enable_async=True)
 add_routers(app)
 

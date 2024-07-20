@@ -30,8 +30,16 @@ class Universal_DB:
                 return app
         return None
 
+    def get_apps_by_system(self, system: str):
+        system = system.upper()
+        return [app for app in self.cache if system in app["systems"]]
+
     def get_random_app(self) -> App:
         return random.choice(self.cache)
+
+    @property
+    def all_applications(self):
+        return self.cache
 
     @classmethod
     async def from_redis(cls, pool: aioredis.Redis) -> Self:

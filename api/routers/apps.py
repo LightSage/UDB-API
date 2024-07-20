@@ -1,5 +1,5 @@
 """
-Copyright 2021-2022 LightSage
+Copyright 2021-2024 LightSage
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -13,7 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
-from typing import Any, Dict, List, Optional
+from typing import Any, Dict, List, Optional, Literal
 
 import rapidfuzz
 from fastapi import APIRouter, HTTPException
@@ -24,10 +24,17 @@ router = APIRouter(tags=['applications'])
 
 
 @router.get("/search/{application}")
-async def search_apps(application: str, request: Request) -> Dict[str, List[Dict[str, Any]]]:
-    """Searches for applications."""
+async def search_apps(application: str,
+                      request: Request,
+                      system: Optional[Literal['3ds', 'ds']] = None) -> Dict[str, List[Dict[str, Any]]]:
+    """Searches for applications"""
     apps = []
-    all_apps: List[str] = request.app.state.cache.get_app_names()
+    if system:
+        sys_apps = request.app.state.cache.get_apps_by_system(system)
+        all_apps = [app['title'] for app in sys_apps]
+    else:
+        all_apps: List[str] = request.app.state.cache.get_app_names()
+
     all_apps.sort(key=len)
     for name, _, _ in rapidfuzz.process.extract(application, all_apps, scorer=rapidfuzz.fuzz.QRatio,
                                                 score_cutoff=50):
@@ -55,7 +62,7 @@ async def get_random_app(request: Request, limit: Optional[int] = None):
     """Gets a random application"""
     limit = limit or 1
 
-    if limit > len(request.app.state.cache.cache):
+    if limit > len(request.app.state.cache.all_applications):
         raise HTTPException(400, "Limit is too high.")
 
     apps = []
@@ -70,4 +77,4 @@ async def get_random_app(request: Request, limit: Optional[int] = None):
 @router.get("/all")
 async def get_all_apps(request: Request):
     """Gets all applications that are cached"""
-    return request.app.state.cache.cache
+    return request.app.state.cache.all_applications
