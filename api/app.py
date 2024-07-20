@@ -17,6 +17,7 @@ from __future__ import annotations
 
 import asyncio
 import json
+from contextlib import asynccontextmanager
 
 import sentry_sdk
 from fastapi import FastAPI
@@ -49,9 +50,6 @@ class App(FastAPI):
 
 
 load_sentry()
-app = App(title="UDB API", version="2.0.0", docs_url='/swagger-docs', redoc_url=None)
-jinja_env = Environment(loader=FileSystemLoader('templates'), enable_async=True)
-add_routers(app)
 
 
 async def udb_cache_loop():
@@ -61,8 +59,8 @@ async def udb_cache_loop():
         await asyncio.sleep(600)
 
 
-@app.on_event("startup")
-async def on_startup() -> None:
+@asynccontextmanager
+async def lifespan(app: App):
     with open("config.json") as fp:
         config = json.load(fp)
 
@@ -70,11 +68,14 @@ async def on_startup() -> None:
 
     task = asyncio.create_task(udb_cache_loop())
     task.add_done_callback(log_exception)
-
-
-@app.on_event("shutdown")
-async def on_shutdown() -> None:
+    yield
     await app.redis.close()
+
+app = App(title="UDB API", version="2.0.0", docs_url='/swagger-docs',
+          redoc_url=None, lifespan=lifespan)
+jinja_env = Environment(loader=FileSystemLoader('templates'),
+                        enable_async=True)
+add_routers(app)
 
 
 @app.get("/docs", include_in_schema=False)
