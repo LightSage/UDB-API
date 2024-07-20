@@ -20,6 +20,7 @@ import rapidfuzz
 from fastapi import APIRouter, HTTPException
 
 from ..request import Request
+from ..models import Application
 
 router = APIRouter(tags=['applications'])
 
@@ -27,7 +28,7 @@ router = APIRouter(tags=['applications'])
 @router.get("/search/{application}")
 async def search_apps(application: str,
                       request: Request,
-                      system: Optional[Literal['3ds', 'ds']] = None) -> Dict[str, List[Dict[str, Any]]]:
+                      system: Optional[Literal['3ds', 'ds']] = None) -> Dict[str, List[Application]]:
     """Searches for applications with optional filter query params"""
     apps = []
     if system:
@@ -46,7 +47,7 @@ async def search_apps(application: str,
 
 
 @router.get("/get/{application}", deprecated=True)
-async def get_app(application: str, request: Request):
+async def get_app(application: str, request: Request) -> Application:
     """Gets an application.
 
     WARNING: This route will not fuzzy search like /search does."""
@@ -61,7 +62,7 @@ async def get_app(application: str, request: Request):
 @router.get("/random")
 async def get_random_app(request: Request,
                          limit: Optional[int] = None,
-                         system: Optional[Literal['3ds', 'ds']] = None):
+                         system: Optional[Literal['3ds', 'ds']] = None) -> List[Application]:
     """Gets a random application with optional filter query params"""
     limit = limit or 1
 
@@ -86,3 +87,5 @@ async def get_random_app(request: Request,
 async def get_all_apps(request: Request):
     """Gets all applications that are cached"""
     return request.app.state.cache.all_applications
+
+Application.model_rebuild()
