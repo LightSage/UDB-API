@@ -13,6 +13,7 @@ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
 """
+import random
 from typing import Any, Dict, List, Optional, Literal
 
 import rapidfuzz
@@ -58,17 +59,24 @@ async def get_app(application: str, request: Request):
 
 
 @router.get("/random")
-async def get_random_app(request: Request, limit: Optional[int] = None):
-    """Gets a random application"""
+async def get_random_app(request: Request,
+                         limit: Optional[int] = None,
+                         system: Optional[Literal['3ds', 'ds']] = None):
+    """Gets a random application with optional filter query params"""
     limit = limit or 1
 
-    if limit > len(request.app.state.cache.all_applications):
+    if system:
+        all_apps = request.app.state.cache.get_apps_by_system(system)
+    else:
+        all_apps = request.app.state.cache.all_applications
+
+    if limit > len(all_apps):
         raise HTTPException(400, "Limit is too high.")
 
     apps = []
     for _ in range(limit):
         # TODO: Unique only
-        appl = request.app.state.cache.get_random_app()
+        appl = random.choice(all_apps)
         apps.append(appl)
 
     return apps

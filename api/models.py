@@ -34,9 +34,6 @@ class Universal_DB:
         system = system.upper()
         return [app for app in self.cache if system in app["systems"]]
 
-    def get_random_app(self) -> App:
-        return random.choice(self.cache)
-
     @property
     def all_applications(self):
         return self.cache
