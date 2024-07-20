@@ -18,6 +18,7 @@ from typing import Dict, List, Literal, Optional
 
 import rapidfuzz
 from fastapi import APIRouter, HTTPException
+from pydantic import BaseModel
 
 from ..models import Application
 from ..request import Request
@@ -25,10 +26,14 @@ from ..request import Request
 router = APIRouter(tags=['applications'])
 
 
-@router.get("/search/{application}")
+class SearchResult(BaseModel):
+    results: List[Application]
+
+
+@router.get("/search/{application}", response_model=SearchResult)
 async def search_apps(application: str,
                       request: Request,
-                      system: Optional[Literal['3ds', 'ds']] = None) -> Dict[str, List[Application]]:
+                      system: Optional[Literal['3ds', 'ds']] = None):
     """Searches for applications with optional filter query params"""
     apps = []
     if system:
