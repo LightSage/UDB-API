@@ -3,10 +3,10 @@ from __future__ import annotations
 import json
 from datetime import datetime
 from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Union
-from typing_extensions import TypedDict
-from pydantic import BaseModel, Field, AnyUrl
 
+from pydantic import AnyUrl, BaseModel, Field
 from redis import asyncio as aioredis
+from typing_extensions import TypedDict
 
 if TYPE_CHECKING:
     from typing_extensions import Self

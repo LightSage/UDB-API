@@ -19,8 +19,8 @@ import os.path
 from datetime import datetime, timezone
 
 import aiohttp
-from redis import asyncio as aioredis
 import sentry_sdk
+from redis import asyncio as aioredis
 
 
 async def actual_work(redis_dsn: str):

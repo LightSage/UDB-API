@@ -2,8 +2,8 @@ from __future__ import annotations
 
 import asyncio
 
-from redis import asyncio as aioredis
 import sentry_sdk
+from redis import asyncio as aioredis
 
 
 def log_exception(task: asyncio.Task):

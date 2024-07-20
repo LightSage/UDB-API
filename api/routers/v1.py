@@ -14,21 +14,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 """
 import random
-from typing import Dict, List, Literal, Optional
+from typing import Any, Dict, List, Literal, Optional
 
 import rapidfuzz
 from fastapi import APIRouter, HTTPException
 
-from ..models import Application
 from ..request import Request
 
-router = APIRouter(tags=['applications'])
+router = APIRouter(prefix="/v1")
 
 
 @router.get("/search/{application}")
 async def search_apps(application: str,
                       request: Request,
-                      system: Optional[Literal['3ds', 'ds']] = None) -> Dict[str, List[Application]]:
+                      system: Optional[Literal['3ds', 'ds']] = None) -> Dict[str, Dict[str, Any]]:
     """Searches for applications with optional filter query params"""
     apps = []
     if system:
@@ -47,7 +46,7 @@ async def search_apps(application: str,
 
 
 @router.get("/get/{application}", deprecated=True)
-async def get_app(application: str, request: Request) -> Application:
+async def get_app(application: str, request: Request):
     """Gets an application.
 
     WARNING: This route will not fuzzy search like /search does."""
@@ -62,7 +61,7 @@ async def get_app(application: str, request: Request) -> Application:
 @router.get("/random")
 async def get_random_app(request: Request,
                          limit: Optional[int] = None,
-                         system: Optional[Literal['3ds', 'ds']] = None) -> List[Application]:
+                         system: Optional[Literal['3ds', 'ds']] = None):
     """Gets a random application with optional filter query params"""
     limit = limit or 1
 
@@ -87,5 +86,3 @@ async def get_random_app(request: Request,
 async def get_all_apps(request: Request):
     """Gets all applications that are cached"""
     return request.app.state.cache.all_applications
-
-Application.model_rebuild()

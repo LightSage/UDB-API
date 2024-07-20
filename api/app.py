@@ -18,10 +18,10 @@ from __future__ import annotations
 import asyncio
 import json
 
-from redis import asyncio as aioredis
 import sentry_sdk
 from fastapi import FastAPI
 from jinja2 import Environment, FileSystemLoader
+from redis import asyncio as aioredis
 from starlette.responses import HTMLResponse
 
 from .models import Universal_DB
@@ -49,7 +49,7 @@ class App(FastAPI):
 
 
 load_sentry()
-app = App(title="UDB API", version="1.3.0", docs_url='/swagger-docs', redoc_url=None)
+app = App(title="UDB API", version="2.0.0", docs_url='/swagger-docs', redoc_url=None)
 jinja_env = Environment(loader=FileSystemLoader('templates'), enable_async=True)
 add_routers(app)
 
