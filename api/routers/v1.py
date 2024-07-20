@@ -21,7 +21,7 @@ from fastapi import APIRouter, HTTPException
 
 from ..request import Request
 
-router = APIRouter(prefix="/v1")
+router = APIRouter(prefix="/v1", tags=['v1'])
 
 
 @router.get("/search/{application}")
