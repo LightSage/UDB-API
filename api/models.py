@@ -16,28 +16,28 @@ App = Dict[str, Any]
 
 
 class Universal_DB:
-    __slots__ = ("cache", "integrity")
+    __slots__ = ("_cache", "integrity")
 
     def __init__(self, cache: List[App], integrity: datetime) -> None:
-        self.cache: List[App] = cache
+        self._cache: List[App] = cache
         self.integrity: datetime = integrity
 
     def get_app_names(self) -> List[str]:
-        return [app['title'] for app in self.cache]
+        return [app['title'] for app in self._cache]
 
     def get_app(self, application: str) -> Optional[App]:
-        for app in self.cache:
+        for app in self._cache:
             if app['title'] == application:
                 return app
         return None
 
     def get_apps_by_system(self, system: str):
         system = system.upper()
-        return [app for app in self.cache if system in app["systems"]]
+        return [app for app in self._cache if system in app["systems"]]
 
     @property
     def all_applications(self):
-        return self.cache
+        return self._cache
 
     @classmethod
     async def from_redis(cls, pool: aioredis.Redis) -> Self:
