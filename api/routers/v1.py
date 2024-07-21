@@ -27,7 +27,7 @@ router = APIRouter(prefix="/v1", tags=['v1'])
 @router.get("/search/{application}")
 async def search_apps(application: str,
                       request: Request,
-                      system: Optional[Literal['3ds', 'ds']] = None) -> Dict[str, Dict[str, Any]]:
+                      system: Optional[Literal['3ds', 'ds']] = None) -> Dict[str, List[Dict[str, Any]]]:
     """Searches for applications with optional filter query params"""
     apps = []
     if system:

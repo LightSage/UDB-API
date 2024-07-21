@@ -134,7 +134,7 @@ class Application(BaseModel):
     urls: List[AnyUrl]
     version: Optional[str] = None
     version_title: Optional[str] = None
-    qr: Optional[Dict[str, str]] = None
+    qr: Optional[Dict[str, AnyUrl]] = None
     prerelease: Optional[PreReleaseApplication] = None
     archive: Optional[Dict[str, Any]] = None
     autogen_scripts: Optional[bool] = None
