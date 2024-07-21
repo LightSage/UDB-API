@@ -102,6 +102,11 @@ class ApplicationScript(BaseModel):
     output: Optional[str] = None
 
 
+class NightlyApplicationScript(BaseModel):
+    script: List[ApplicationScript]
+    type: str
+
+
 class Application(BaseModel):
     # Based on genson & datamodel-code-gen
     author: str
@@ -122,7 +127,7 @@ class Application(BaseModel):
     license_name: Optional[str] = None
     long_description: Optional[str] = None
     priority: bool
-    scripts: Optional[Dict[str, List[ApplicationScript]]] = None
+    scripts: Optional[Dict[str, Union[List[ApplicationScript], NightlyApplicationScript]]] = None
     slug: str
     source: Optional[AnyUrl] = None
     systems: List[Literal['3DS', 'DS']]
