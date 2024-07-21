@@ -43,7 +43,9 @@ async def search_apps(application: str,
         all_apps: List[str] = request.app.state.cache.get_app_names()
 
     all_apps.sort(key=len)
-    for name, _, _ in rapidfuzz.process.extract(application, all_apps, scorer=rapidfuzz.fuzz.QRatio,
+    for name, _, _ in rapidfuzz.process.extract(application, all_apps,
+                                                scorer=rapidfuzz.fuzz.QRatio,
+                                                processor=rapidfuzz.utils.default_process,
                                                 score_cutoff=50):
         a = request.app.state.cache.get_app(name)
         apps.append(a)
