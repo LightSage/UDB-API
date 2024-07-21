@@ -73,8 +73,7 @@ async def lifespan(app: App):
 
 app = App(title="UDB API", version="2.0.0", docs_url='/swagger-docs',
           redoc_url=None, lifespan=lifespan)
-jinja_env = Environment(loader=FileSystemLoader('templates'),
-                        enable_async=True)
+jinja_env = Environment(loader=FileSystemLoader('templates'))
 add_routers(app)
 
 
@@ -109,5 +108,5 @@ async def docs():
 @app.get("/", include_in_schema=False)
 async def home():
     tmpl = jinja_env.get_template("home.html")
-    rendered = await tmpl.render_async()
+    rendered = tmpl.render()
     return HTMLResponse(rendered)
