@@ -80,9 +80,9 @@ class PreReleaseApplication(BaseModel):
     version_title: Optional[str] = None
 
 
-class ApplicationDownloadInner(TypedDict):
-    size: int
-    size_str: str
+class ApplicationDownloadInner(BaseModel):
+    size: Optional[int] = None
+    size_str: Optional[str] = None
     url: AnyUrl
 
 
