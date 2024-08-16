@@ -71,7 +71,7 @@ async def lifespan(app: App):
     yield
     await app.redis.close()
 
-app = App(title="UDB API", version="2.0.0", docs_url='/swagger-docs',
+app = App(title="UDB API", version="2.0.1", docs_url='/swagger-docs',
           redoc_url=None, lifespan=lifespan)
 jinja_env = Environment(loader=FileSystemLoader('templates'))
 add_routers(app)

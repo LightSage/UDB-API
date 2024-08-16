@@ -92,7 +92,7 @@ async def get_random_app(request: Request,
 
 @router.get("/all")
 async def get_all_apps(request: Request):
-    """Gets all applications that are cached"""
+    """Gets all applications"""
     return request.app.state.cache.all_applications
 
 Application.model_rebuild()
