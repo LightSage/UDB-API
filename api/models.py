@@ -107,6 +107,11 @@ class NightlyApplicationScript(BaseModel):
     type: str
 
 
+class SizeableApplicationScript(BaseModel):
+    script: List[ApplicationScript]
+    size: str
+
+
 class Application(BaseModel):
     # Based on genson & datamodel-code-gen
     author: str
@@ -127,7 +132,7 @@ class Application(BaseModel):
     license_name: Optional[str] = None
     long_description: Optional[str] = None
     priority: bool
-    scripts: Optional[Dict[str, Union[List[ApplicationScript], NightlyApplicationScript]]] = None
+    scripts: Optional[Dict[str, Union[List[ApplicationScript], NightlyApplicationScript, SizeableApplicationScript]]] = None
     slug: str
     source: Optional[AnyUrl] = None
     systems: List[Literal['3DS', 'DS']]
