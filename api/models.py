@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import json
 from datetime import datetime
-from functools import cached_property
 from typing import TYPE_CHECKING, Any, Dict, List, Literal, Optional, Union
 
 from pydantic import AnyUrl, BaseModel, Field
@@ -23,7 +22,6 @@ class Universal_DB:
         self._cache: List[App] = cache
         self.integrity: datetime = integrity
 
-    @cached_property
     def get_app_names(self) -> List[str]:
         return [app['title'] for app in self._cache]
 
