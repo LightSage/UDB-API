@@ -131,7 +131,6 @@ class Application(BaseModel):
     license: Optional[str] = None
     license_name: Optional[str] = None
     long_description: Optional[str] = None
-    priority: bool
     scripts: Optional[Dict[str, Union[List[ApplicationScript], NightlyApplicationScript, SizeableApplicationScript]]] = None
     slug: str
     source: Optional[AnyUrl] = None
