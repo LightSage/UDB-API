@@ -1,6 +1,6 @@
 aiohttp[speedups]==3.11.14
 fastapi>=0.109.1
-rapidfuzz==3.9.6
+rapidfuzz==3.12.2
 Jinja2==3.1.6
 psutil==5.9.2
 sentry-sdk==2.24.1
