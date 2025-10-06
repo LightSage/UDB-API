@@ -1,4 +1,4 @@
-aiohttp[speedups]==3.12.15
+aiohttp[speedups]==3.13.0
 fastapi>=0.109.1
 rapidfuzz==3.14.0
 Jinja2==3.1.6
