@@ -1,10 +1,8 @@
 # UDB-API
 
-An actual API for Universal DB.
+An API that wraps the [Universal DB](https://db.universal-team.net/) json file, built with FastAPI! 💪
 
-You can find the API at https://udb-api.lightsage.dev/
-
-Documentation for API endpoints can be found at https://udb-api.lightsage.dev/docs/
+You can find the public API at https://udb-api.lightsage.dev/ with documentation located at https://udb-api.lightsage.dev/docs/
 
 
 ### General self-hosting tips
