@@ -79,27 +79,29 @@ add_routers(app)
 
 @app.get("/docs", include_in_schema=False)
 async def docs():
-    html = f"""<!doctype html> <!-- Important: must specify -->
+    html = f"""<!doctype html>
 <html>
 <head>
-  <meta charset="utf-8"> <!-- Important: rapi-doc uses utf8 characters -->
-  <script type="module" src="https://unpkg.com/rapidoc/dist/rapidoc-min.js"></script>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+
   <meta name="title" content="Universal DB API">
   <meta name="author" content="LightSage">
   <meta property="og:title" content="Universal DB API">
   <meta property="og:type" content="website">
-  <meta property="og:description" content="An actual Universal DB API">
+  <meta property="og:description" content="An API that wraps the Universal DB JSON file">
   <meta property="og:url" content="https://udb-api.lightsage.dev">
   <meta property="og:image" content="">
   <title>Universal DB API</title>
+
+  <script src="https://unpkg.com/@stoplight/elements/web-components.min.js"></script>
+  <link rel="stylesheet" href="https://unpkg.com/@stoplight/elements/styles.min.css">
 </head>
 <body>
-  <rapi-doc
-    spec-url="{app.openapi_url}"
-    theme = "light"
-    render-style = "read"
-    show-method-in-nav-bar = "as-colored-text"
-  > </rapi-doc>
+  <elements-api
+    apiDescriptionUrl="{app.openapi_url}"
+    router="hash"
+  > </elements-api>
 </body>
 </html>"""
     return HTMLResponse(html)
